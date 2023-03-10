@@ -1,0 +1,115 @@
+# Doctype : MCS Stock Reco - Item Appending (version update) : Before save : To append item when a choice is made in choosing the
+# filters (Item, Warehouse and Project)
+# Also works for the download/upload i.e item, project, warehouse and/or batch is added
+import frappe
+from frappe import doc
+
+
+if (doc.picked == 0):
+    sum = 0
+    if doc.edit_date_time == 0:
+        doc.posting_time = frappe.utils.nowtime()
+    if (doc.item):
+        sum = sum + 1
+    if (doc.warehouse):
+        sum = sum + 1
+    if (doc.project):
+        sum = sum + 1
+    if (sum == 0) and (len(doc.get('items')) != 0):
+        for d in doc.get('items'):
+            for pbs in frappe.get_all('Project Based Stock',fields =  ['item','project','company','uom','stock','warehouse','batch']):
+                if (d.batch == '') or (d.batch == None):
+                    if (d.item_code == pbs.item) and (d.warehouse == pbs.warehouse) and (d.project == pbs.project) and (doc.company == pbs.company):
+                        d.current_qty = pbs.stock 
+                else:
+                    if (d.item_code == pbs.item) and (d.warehouse == pbs.warehouse) and (d.project == pbs.project) and (doc.company == pbs.company) and (d.batch == pbs.batch):
+                        d.current_qty = pbs.stock
+        
+        doc.picked = 1
+            
+    
+    if sum > 0:
+            
+        for pbs in frappe.get_all('Project Based Stock',fields =  ['item','project','company','uom','stock','warehouse','batch']):
+            if sum == 1:
+                if doc.item:
+                    if (pbs.item == doc.item) and (pbs.company == doc.company):
+                        doc.append('items',{
+                            'item_code' : pbs.item,
+                            'warehouse': pbs.warehouse,
+                            'qty': pbs.stock,
+                            'current_qty': pbs.stock,
+                            'project': pbs.project,
+                            'batch': pbs.batch
+                        }) if float(pbs.stock) > 0 else 0
+                        doc.picked = 1
+                
+                if doc.warehouse and (pbs.company == doc.company):
+                    if pbs.warehouse == doc.warehouse:
+                        doc.append('items',{
+                            'item_code' : pbs.item,
+                            'warehouse': pbs.warehouse,
+                            'qty': pbs.stock,
+                            'current_qty': pbs.stock,
+                            'project': pbs.project,
+                            'batch': pbs.batch
+                        })if float(pbs.stock) > 0 else 0
+                        doc.picked = 1
+                if doc.project and (pbs.company == doc.company):
+                    if pbs.project == doc.project:
+                        doc.append('items',{
+                            'item_code' : pbs.item,
+                            'warehouse': pbs.warehouse,
+                            'qty': pbs.stock,
+                            'current_qty': pbs.stock,
+                            'project': pbs.project,
+                            'batch': pbs.batch
+                        })if float(pbs.stock) > 0 else 0
+                        doc.picked = 1
+            
+            if sum == 2:
+                if (doc.item) and (doc.warehouse):
+                    if (pbs.item == doc.item) and (pbs.warehouse == doc.warehouse) and (pbs.company == doc.company):
+                        doc.append('items',{
+                            'item_code' : pbs.item,
+                            'warehouse': pbs.warehouse,
+                            'qty': pbs.stock,
+                            'current_qty': pbs.stock,
+                            'project': pbs.project,
+                            'batch': pbs.batch
+                        })if float(pbs.stock) > 0 else 0
+                        doc.picked = 1
+                if (doc.item) and (doc.project):
+                    if (pbs.item == doc.item) and (pbs.project == doc.project) and (pbs.company == doc.company):
+                        doc.append('items',{
+                            'item_code' : pbs.item,
+                            'warehouse': pbs.warehouse,
+                            'qty': pbs.stock,
+                            'current_qty': pbs.stock,
+                            'project': pbs.project,
+                            'batch': pbs.batch
+                        })if float(pbs.stock) > 0 else 0
+                        doc.picked = 1
+                if (doc.project) and (doc.warehouse):
+                    if (pbs.project == doc.project) and (pbs.warehouse == doc.warehouse) and (pbs.company == doc.company):
+                        doc.append('items',{
+                            'item_code' : pbs.item,
+                            'warehouse': pbs.warehouse,
+                            'qty': pbs.stock,
+                            'current_qty': pbs.stock,
+                            'project': pbs.project,
+                            'batch': pbs.batch
+                        })if float(pbs.stock) > 0 else 0
+                        doc.picked = 1
+            
+            if sum == 3:
+                if (pbs.item == doc.item) and (pbs.warehouse == doc.warehouse) and (pbs.project == doc.project) and (pbs.company == doc.company) :
+                        doc.append('items',{
+                            'item_code' : pbs.item,
+                            'warehouse': pbs.warehouse,
+                            'qty': pbs.stock,
+                            'current_qty': pbs.stock,
+                            'project': pbs.project,
+                            'batch': pbs.batch
+                        })if float(pbs.stock) > 0 else 0
+                        doc.picked = 1
