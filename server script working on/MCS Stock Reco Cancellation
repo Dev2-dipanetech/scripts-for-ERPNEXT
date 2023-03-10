@@ -1,0 +1,10 @@
+## FOR STOCK ENTRY ##
+import frappe
+from frappe import doc
+for se in frappe.get_list('Stock Entry', filter = {'stock_reconciliation' : doc.name, 'docstatus': '1'}) :
+    frappe.db.set_value ('Stock Entry', se.name, 'docstatus' , '2')
+
+## FOR PROJECT BASED STOCK ##
+pbs = frappe.get_all('Project Based Stock')
+for s_reco in doc.get('items'):
+    pass
