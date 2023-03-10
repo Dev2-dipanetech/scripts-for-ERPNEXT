@@ -5,6 +5,6 @@ for se in frappe.get_list('Stock Entry', filter = {'stock_reconciliation' : doc.
     frappe.db.set_value ('Stock Entry', se.name, 'docstatus' , '2')
 
 ## FOR PROJECT BASED STOCK ##
-pbs = frappe.get_all('Project Based Stock')
-for s_reco in doc.get('items'):
-    pass
+# pbs = frappe.get_all('Project Based Stock')
+for d in doc.get('items'):
+    pbs = frappe.get_last_doc('Project Based Stock', filters = {'items': d.item_code, 'project':d.project})
