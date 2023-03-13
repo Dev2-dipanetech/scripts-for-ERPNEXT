@@ -1,10 +1,39 @@
-## FOR STOCK ENTRY ##
-import frappe
-from frappe import doc
-for se in frappe.get_list('Stock Entry', filter = {'stock_reconciliation' : doc.name, 'docstatus': '1'}) :
-    frappe.db.set_value ('Stock Entry', se.name, 'docstatus' , '2')
-
 ## FOR PROJECT BASED STOCK ##
 # pbs = frappe.get_all('Project Based Stock')
+
+# For changing the value of Project Based Stock(PBS) back before the current reconciliation
+
 for d in doc.get('items'):
-    pbs = frappe.get_last_doc('Project Based Stock', filters = {'items': d.item_code, 'project':d.project})
+    if (d.batch == None) or (d.batch == ''):    #Items without Batch number
+        for pbs in frappe.get_all('Project Based Stock',
+                                  fields = ['name'],
+                                  filters = {
+                                      'project': d.project,
+                                      'company': doc.company,
+                                      'item': d.item_code,
+                                      'warehouse': d.warehouse
+                                  }):
+                                    #   frappe.throw(pbs.name)
+                                      pbs_nb = frappe.get_doc('Project Based Stock', pbs)
+                                      pbs_nb.stock = d.current_qty
+                                      if pbs_nb.stock_reconciliation == pbs_nb.p_st_reco:
+                                          pbs_nb.stock_reconciliation = pbs_nb.p_st_reco = None
+                                      else:
+                                          pbs_nb.stock_reconciliation = pbs_nb.p_st_reco if pbs_nb.p_st_reco else None
+                                      pbs_nb.save()
+    else :                                      #Items with Batch number
+        for pbs in frappe.get_all('Project Based Stock',
+                                  fields = ['name'],
+                                  filters = {
+                                      'project': d.project,
+                                      'company': doc.company,
+                                      'item': d.item_code,
+                                      'warehouse': d.warehouse,
+                                      'batch': d.batch
+                                  }):
+                                      pbs_b = frappe.get_doc('Project Based Stock', pbs)
+                                      if pbs_b.stock_reconciliation == pbs_b.p_st_reco:
+                                          pbs_b.stock_reconciliation = pbs_b.p_st_reco = None
+                                      else:
+                                          pbs_b.stock_reconciliation = pbs_b.p_st_reco if d.p_st_reco else None
+                                      pbs_b.save()
