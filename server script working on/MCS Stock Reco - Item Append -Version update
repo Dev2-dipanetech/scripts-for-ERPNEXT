@@ -20,10 +20,12 @@ if (doc.picked == 0):
             for pbs in frappe.get_all('Project Based Stock',fields =  ['item','project','company','uom','stock','warehouse','batch']):
                 if (d.batch == '') or (d.batch == None):
                     if (d.item_code == pbs.item) and (d.warehouse == pbs.warehouse) and (d.project == pbs.project) and (doc.company == pbs.company):
-                        d.current_qty = pbs.stock 
+                        d.current_qty = pbs.stock
+                        d.diff_qty = d.qty - d.current_qty  # Calculate the difference when files are uploaded
                 else:
                     if (d.item_code == pbs.item) and (d.warehouse == pbs.warehouse) and (d.project == pbs.project) and (doc.company == pbs.company) and (d.batch == pbs.batch):
                         d.current_qty = pbs.stock
+                        d.diff_qty = d.qty - d.current_qty  # Calculate the difference when files are uploaded
         
         doc.picked = 1
             

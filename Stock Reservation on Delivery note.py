@@ -14,6 +14,11 @@ if (doc.company == "Multicolor Steels (India) Pvt Ltd"):
                 project = doc.project
             else:
                 project = d.project
+            ## The 4 lines below are to make sure that item with batches ARE IGNORED
+            if batch == '':
+                batch = None
+            if batch:
+                continue
             
             flag = 0
             
